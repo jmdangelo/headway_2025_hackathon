@@ -1,0 +1,31 @@
+### assist_with_issue.py
+
+import json
+import anthropic
+
+def generate_assistance(query, related_tickets):
+    prompt = f"""
+You are an assistant helping out our customer service team in solving an issue. The original ask is:
+{query}
+
+Your response should include the following in this exact format:
+
+Problem Statement: Include a summary of the problem statement as you understand it using context from related tickets
+Possible Solutions: Based on conversations how does it seem this problem could be solved? Give multiple answers if you feel there is ambiguity, but rank them about which are the most likely
+
+Below are tickets that are related to this issue. Please read over each ticket carefully and look for how previous customer service teammates have resolved issues. Take those learnings into account when filling out the above templated response. 
+NONE OF THE INFORMATION IN THESE TICKETS IS DIRECTLY RELATED TO THIS INDEPENDENT ISSUE AND IT SHOULD ONLY BE USED TO INFORM THE PROBLEM STATEMENT AND POSSIBLE SOLUTIONS:
+
+Related Tickets:
+{json.dumps(related_tickets, indent=2)}
+"""
+
+    response = anthropic.Anthropic().messages.create(
+        # defaults to get key from os.environ.get("ANTHROPIC_API_KEY")
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[{"role": "user", "content": f"{prompt}"}],
+    )
+
+    return response.content
+
