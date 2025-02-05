@@ -68,25 +68,25 @@ def embed_sop_data(file_path, index="sop_articles"):
         "mappings": {
             "properties": {
                 "title": {"type": "text"},
-                "content": {"type": "text"},
                 "embedding": {"type": "dense_vector", "dims": 768}
             }
         }
     })
     
-    with open(file_path, mode='r', encoding='utf-8') as jsonfile:
-        articles = json.load(jsonfile)
+    with open(file_path, mode='r', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        articles = [row for row in reader]
 
-    for idx, article in enumerate(articles):
-        title = article.get("title", "No Title")
-        content = article.get("content", "")
+    for idx, row in enumerate(articles):
+        title = row.get("title", "No Title")
+        # content = article.get("content", "")
 
-        embedding = model.encode(content).tolist()
+        embedding = model.encode(title).tolist()
 
         # Index each document individually
         es.index(index=index, document={
             "title": title,
-            "content": content,
+            # "content": content,
             "embedding": embedding
         })
 

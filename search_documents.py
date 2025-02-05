@@ -20,5 +20,6 @@ def search_tickets(query, size=100, index="zendesk_tickets"):
             }
         }
     })
+    # print(f"length of response: {len(response['hits']['hits'])}")
 
     return response['hits']['hits']

@@ -3,7 +3,7 @@ from search_documents import search_tickets
 from assist_with_issue import generate_zendesk_assistance, generate_sop_assistance
 import sys
 
-elasticsearch_index = "zendesk_tickets_large"
+zendesk_index = "zendesk_tickets_large_clean"
 sop_index = "sop_data"
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -11,7 +11,7 @@ if __name__ == "__main__":
             # Embed Zendesk data from CSV
             print("Embedding Zendesk ticket data...")
             csv_file_path = 'files/snowflake_data.csv'
-            embed_data(csv_file_path, batch_size=500, index=elasticsearch_index)
+            embed_data(csv_file_path, batch_size=2000, index=zendesk_index)
         if 'index_sop' in sys.argv:
             # Embed SOP data from CSV
             print("Embedding SOP data...")
@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     # Search example
     query = input("Enter your search query: ")
-    results = search_tickets(query, size=20, index=elasticsearch_index)
+    results = search_tickets(query, size=150, index=zendesk_index)
     related_zendesk_tickets = []
     for hit in results:
         related_zendesk_tickets.append({
@@ -30,14 +30,23 @@ if __name__ == "__main__":
     print(f"Related Zendesk Tickets: {related_zendesk_tickets}")
 
     # Get AI assistance
-    ai_response = generate_zendesk_assistance(query, results)
+    ai_response = generate_zendesk_assistance(query, related_zendesk_tickets)
+
+    print(f"First AI Assistance Response: {ai_response[0].text}")
 
     # TODO: query against SOP index with ai response
-    # sop_results = search_tickets(ai_response, size=200, index=sop_index)
+    sop_results = search_tickets(ai_response[0].text, size=45, index=sop_index)
+    related_sop_titles = []
+    for hit in sop_results:
+        related_sop_titles.append({
+            "title": hit['_source'].get('title', 'No Title')
+        })
+
+    print(f"Related SOP Articles: {related_sop_titles}")
 
     # Ask AI for final response
-    # ai_response = generate_sop_assistance(ai_response[0].text, sop_results)
+    final_ai_response = generate_sop_assistance(ai_response[0].text, related_sop_titles)
 
     # Display results
-    print("AI Assistance Response:")
-    print(ai_response[0].text)
+    print("final AI Assistance Response:")
+    print(final_ai_response[0].text)
