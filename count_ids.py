@@ -14,4 +14,4 @@ with open(csv_file_path, mode='r', encoding='utf-8') as csvfile:
         if ticket_id:
             unique_ticket_ids.add(ticket_id)
 
-print(f"Total unique ZENDESK_TICKET_IDs in index: {len(unique_ticket_ids)}")
+print(f"Total unique ZENDESK_TICKET_IDs in file: {len(unique_ticket_ids)}")
