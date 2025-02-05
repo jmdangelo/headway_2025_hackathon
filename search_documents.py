@@ -21,11 +21,4 @@ def search_tickets(query, size=100, index="zendesk_tickets"):
         }
     })
 
-    results = []
-    for hit in response['hits']['hits']:
-        results.append({
-            "subject": hit['_source'].get('subject', 'No Subject'),
-            "conversation": hit['_source']['conversation']
-        })
-
-    return results
+    return response['hits']['hits']

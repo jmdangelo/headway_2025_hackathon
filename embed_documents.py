@@ -10,6 +10,7 @@ es = Elasticsearch("http://localhost:9200")
 
 model = SentenceTransformer('paraphrase-MPNet-base-v2')
 
+
 def embed_data(csv_file_path, batch_size=500, index="zendesk_tickets"):
     # Ensure the index exists with the correct mapping
     es.indices.create(index=index, ignore=400, body={
@@ -62,3 +63,31 @@ def embed_data(csv_file_path, batch_size=500, index="zendesk_tickets"):
 
     print("Zendesk ticket data embedded and stored successfully.")
 
+def embed_sop_data(file_path, index="sop_articles"):
+    es.indices.create(index=index, ignore=400, body={
+        "mappings": {
+            "properties": {
+                "title": {"type": "text"},
+                "content": {"type": "text"},
+                "embedding": {"type": "dense_vector", "dims": 768}
+            }
+        }
+    })
+    
+    with open(file_path, mode='r', encoding='utf-8') as jsonfile:
+        articles = json.load(jsonfile)
+
+    for idx, article in enumerate(articles):
+        title = article.get("title", "No Title")
+        content = article.get("content", "")
+
+        embedding = model.encode(content).tolist()
+
+        # Index each document individually
+        es.index(index=index, document={
+            "title": title,
+            "content": content,
+            "embedding": embedding
+        })
+
+    print("SOP article data embedded and stored successfully.")
