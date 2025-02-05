@@ -9,11 +9,12 @@
 * run `docker-compose up -d`
 
 ### Populate elasticsearch
-* get data from snowflake in csv format `ZENDESK_TICKET_ID, SUBJECT, COMMENTS`
+* get zendesk data from snowflake in csv format `ZENDESK_TICKET_ID, SUBJECT, COMMENTS`
 * This should be called `snowflake_data.csv` under `files/`
+* TODO: get sop data from confluence
+* File name and structure tbd
 * Uncomment `csv_file_path = 'files/snowflake_data.csv'` and `embed_data(csv_file_path)` in `controller.py`
-* run `python controller.py`
+* run `python controller.py` with `embed_sop` `embed_zendesk` or both.  e.g. `python controller.py index_zendesk index_sop`
 
 ### Searching with already populated elasticsearch
-* Ensure `csv_file_path = 'files/snowflake_data.csv'` and `embed_data(csv_file_path)` in `controller.py` are commented out
-* run `python controller.py`
+* run `python controller.py` with no command line args
