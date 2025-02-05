@@ -20,14 +20,14 @@ if __name__ == "__main__":
 
     # Search example
     query = input("Enter your search query: ")
-    results = search_tickets(query, size=200, index=elasticsearch_index)
-
+    results = search_tickets(query, size=20, index=elasticsearch_index)
     related_zendesk_tickets = []
     for hit in results:
         related_zendesk_tickets.append({
             "subject": hit['_source'].get('subject', 'No Subject'),
             "conversation": hit['_source']['conversation']
         })
+    print(f"Related Zendesk Tickets: {related_zendesk_tickets}")
 
     # Get AI assistance
     ai_response = generate_zendesk_assistance(query, results)
@@ -40,4 +40,4 @@ if __name__ == "__main__":
 
     # Display results
     print("AI Assistance Response:")
-    print(ai_response)
+    print(ai_response[0].text)
