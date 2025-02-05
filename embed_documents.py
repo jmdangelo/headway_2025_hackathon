@@ -10,8 +10,9 @@ es = Elasticsearch("http://localhost:9200")
 
 model = SentenceTransformer('paraphrase-MPNet-base-v2')
 
-def embed_data(csv_file_path):
-    es.indices.create(index="zendesk_tickets", ignore=400, body={
+def embed_data(csv_file_path, batch_size=500, index="zendesk_tickets"):
+    # Ensure the index exists with the correct mapping
+    es.indices.create(index=index, ignore=400, body={
         "mappings": {
             "properties": {
                 "subject": {"type": "text"},
@@ -21,9 +22,10 @@ def embed_data(csv_file_path):
         }
     })
 
+    bulk_data = []
     with open(csv_file_path, mode='r', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
-        for row in reader:
+        for idx, row in enumerate(reader):
             subject = row.get("SUBJECT", "No Subject")
             comments_json = row.get("COMMENTS", "[]")
 
@@ -39,11 +41,24 @@ def embed_data(csv_file_path):
 
             embedding = model.encode(conversation).tolist()
 
-            es.index(index="zendesk_tickets", document={
+            # Prepare bulk request data
+            bulk_data.append({
+                "index": {"_index": index}
+            })
+            bulk_data.append({
                 "subject": subject,
                 "conversation": conversation,
                 "embedding": embedding
             })
+
+            # Send bulk request in batches
+            if len(bulk_data) >= batch_size * 2:
+                es.bulk(index=index, operations=bulk_data)
+                bulk_data = []  # Clear after bulk insert
+
+        # Insert remaining data
+        if bulk_data:
+            es.bulk(index=index, operations=bulk_data)
 
     print("Zendesk ticket data embedded and stored successfully.")
 

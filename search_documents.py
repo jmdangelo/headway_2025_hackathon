@@ -5,10 +5,10 @@ es = Elasticsearch("http://localhost:9200")
 
 model = SentenceTransformer('paraphrase-MPNet-base-v2')
 
-def search_tickets(query, size=100):
+def search_tickets(query, size=100, index="zendesk_tickets"):
     query_vector = model.encode(query).tolist()
 
-    response = es.search(index="zendesk_tickets", body={
+    response = es.search(index=index, body={
         "size": size,
         "query": {
             "script_score": {
