@@ -1,17 +1,22 @@
 from embed_documents import embed_data, embed_sop_data
 from search_documents import search_tickets
 from assist_with_issue import generate_zendesk_assistance, generate_sop_assistance
+import sys
 
 elasticsearch_index = "zendesk_tickets_large"
 sop_index = "sop_data"
 if __name__ == "__main__":
-    # Embed data from CSV
-    csv_file_path = 'files/snowflake_data.csv'
-    embed_data(csv_file_path, batch_size=500, index=elasticsearch_index)
-
-    # TODO: Add SOP data to another index
-    # sop_csv_file_path = 'files/sop_data.csv'
-    # embed_sop_data(sop_csv_file_path, index=sop_index)
+    if len(sys.argv) > 1:
+        if 'index_zendesk' in sys.argv:
+            # Embed Zendesk data from CSV
+            print("Embedding Zendesk ticket data...")
+            csv_file_path = 'files/snowflake_data.csv'
+            embed_data(csv_file_path, batch_size=500, index=elasticsearch_index)
+        if 'index_sop' in sys.argv:
+            # Embed SOP data from CSV
+            print("Embedding SOP data...")
+            sop_csv_file_path = 'files/sop_data.csv'
+            embed_sop_data(sop_csv_file_path, index=sop_index)
 
     # Search example
     query = input("Enter your search query: ")
