@@ -18,3 +18,6 @@
 
 ### Searching with already populated elasticsearch
 * run `python controller.py` with no command line args
+
+### Clearing an index
+* run 'python clear_index.py INDEX_NAME` to clear an elasticsearch index for repopulating

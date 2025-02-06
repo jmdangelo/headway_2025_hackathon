@@ -2,12 +2,15 @@ version: '3.7'
 
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.1
     container_name: elasticsearch
+    # platform: linux/arm64
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - xpack.ml.enabled=false
+      - "_JAVA_OPTIONS=-XX:UseSVE=0"
+      # LD_BIND_NOW: 1 
     ports:
       - "9200:9200"
     volumes:

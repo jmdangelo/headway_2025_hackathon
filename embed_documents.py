@@ -68,6 +68,8 @@ def embed_sop_data(file_path, index="sop_articles"):
         "mappings": {
             "properties": {
                 "title": {"type": "text"},
+                "url": {"type": "text"},
+                "content": {"type": "text"},
                 "embedding": {"type": "dense_vector", "dims": 768}
             }
         }
@@ -78,15 +80,18 @@ def embed_sop_data(file_path, index="sop_articles"):
         articles = [row for row in reader]
 
     for idx, row in enumerate(articles):
+        # print(row)
         title = row.get("title", "No Title")
-        # content = article.get("content", "")
+        content = row.get("Text", "")
+        url = row.get("URL", "")
 
         embedding = model.encode(title).tolist()
 
         # Index each document individually
         es.index(index=index, document={
             "title": title,
-            # "content": content,
+            "content": content,
+            "url": url,
             "embedding": embedding
         })
 

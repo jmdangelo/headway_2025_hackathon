@@ -5,7 +5,7 @@ import anthropic
 
 def generate_zendesk_assistance(query, related_tickets):
     prompt = f"""
-You are an assistant helping out our customer service team in solving an issue. The original ask is:
+You are an assistant helping out our customer service team in solving an issue.  Your response should be concise and meant to assist a customer service representative at a glace. The original ask is:
 {query}
 
 Your response should include the following in this exact format:
@@ -26,11 +26,12 @@ def generate_sop_assistance(problem_statement, related_articles):
     prompt = f"""
 Given the following response: 
 {problem_statement} 
-I calculated the internal articles that are most relatedto the response I just fed you, those articles are:
-{related_articles}
+I calculated the internal articles that are most related to the response I just fed you, those articles (title, url) are:
+{[(related_articles.get('title'), related_articles.get('url')) for related_articles in related_articles]}
 
 Given that, could you please reformat the above message, and insert references to articles where you think they would be most helpful?
 Make sure to include the exact title of the article next to the reference.
+Format your response so that the articules include a hyperlink to the url, hyperlink format looks like: [title](url).
 In addition, include everything from the original response in your output.  Your only job is to append articules where you see fit,
 And if you don't think they fit in, do not include them.  Bias for accuracy not quantity.
 """

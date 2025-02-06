@@ -35,17 +35,19 @@ if __name__ == "__main__":
     print(f"First AI Assistance Response: {ai_response[0].text}")
 
     # TODO: query against SOP index with ai response
-    sop_results = search_tickets(ai_response[0].text, size=45, index=sop_index)
-    related_sop_titles = []
+    sop_results = search_tickets(ai_response[0].text, size=8, index=sop_index)
+    related_sop_articles = []
     for hit in sop_results:
-        related_sop_titles.append({
-            "title": hit['_source'].get('title', 'No Title')
+        related_sop_articles.append({
+            "title": hit['_source'].get('title', 'No Title'),
+            "content": hit['_source'].get('content', 'No Content'),
+            "url": hit['_source'].get('url', 'No URL')
         })
 
-    print(f"Related SOP Articles: {related_sop_titles}")
+    print(f"Related SOP Articles: {related_sop_articles}")
 
     # Ask AI for final response
-    final_ai_response = generate_sop_assistance(ai_response[0].text, related_sop_titles)
+    final_ai_response = generate_sop_assistance(ai_response[0].text, related_sop_articles)
 
     # Display results
     print("final AI Assistance Response:")
